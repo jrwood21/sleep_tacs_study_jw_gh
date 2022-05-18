@@ -5,6 +5,8 @@ Code adapted from Tom Hardwicke's finger tapping task code: https://github.com/T
 Developed in Psychopy v2022.1.1
 See my GitHub for further details: https://github.com/jrwood21
 """
+
+# import useful modules
 import time
 import pandas as pd
 import numpy as np
@@ -12,15 +14,17 @@ import os
 import openpyxl
 import random
 import psychtoolbox
-from psychopy import visual, event, core, gui, sound
-from psychopy import prefs
-# change the pref library to PTB and set the latency mode to high precision
-prefs.hardware['audioLib'] = 'PTB'
-prefs.hardware['audioLatencyMode'] = 3
+from psychopy import prefs, visual, event, core, gui
+prefs.hardware['audioLib'] = 'PTB' # change the audio library to psychtoolbox for best latencies
+prefs.hardware['audioLatencyMode'] = 3 # set the latency mode to high precision 
+prefs.hardware['audioDriver'] = 'Primary Sound'
+from psychopy import sound # must import sound after changing sound prefs above
+
+micDevice = sound.Microphone.getDevices()[0] # define mic device explicitly
 
 os.chdir(os.path.abspath(''))  # change working directory to script directory
 globalClock = core.Clock()  # create timer to track the time since experiment started
-mic=sound.Microphone(channels=1, streamBufferSecs=10) # buffersecs is the length of the mic recording. Use mic.poll() below to extend recording time
+mic=sound.Microphone(channels=1, streamBufferSecs=10, device=micDevice) # buffersecs is the length of the mic recording. Use mic.poll() below to extend recording time
 
 ### set up some useful functions ###
 # Function to save messages to a log file recording everything the exp is doing
@@ -128,6 +132,8 @@ def wordLearning(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
         dummy_wordlist1_sheet = wordlist_book.worksheets[3]
     elif wordlist == 'wordlist_2':
         dummy_wordlist1_sheet = wordlist_book.worksheets[4]
+    elif wordlist == 'wordlist_prac': # prac word list defined as a dummy word list
+        dummy_wordlist1_sheet = wordlist_book.worksheets[2]
     dummy_c_words, dummy_r_words, dummy_s_order = asWordLists(sheet=dummy_wordlist1_sheet, n_items=8)
     rdum_c_words, rdum_r_words = randomWordLists(cue_words=dummy_c_words, recall_words=dummy_r_words, stim_order=dummy_s_order, num_items=8)
     rand_dummy_c_words = rdum_c_words[0:4] # only select the first 4
@@ -139,8 +145,8 @@ def wordLearning(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
     # display 4 x dummy word pairs in random order for 5s each with 100ms ISI
     displayWordListPairs(num_words=4, cue_wordlist=rand_dummy_c_words, recall_wordlist=rand_dummy_r_words)
     
-    # display word pairs in random order for 5s each with 100ms ISI
-    displayWordLists(num_words=46, cue_wordlist=rand_c_words, recall_wordlist=rand_r_words) 
+    if not metaData['practice mode']: # if it is not practice mode, display the test word pair list in random order
+        displayWordListPairs(num_words=46, cue_wordlist=rand_c_words, recall_wordlist=rand_r_words) 
     
     rand_dummy_c_words = rdum_c_words[4:8] # now select the last 4 dummy word pairs from randomised list
     rand_dummy_r_words = rdum_r_words[4:8]
@@ -211,14 +217,17 @@ def wordRecall(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
     wordlist_book = openpyxl.load_workbook(workbook) # read in word lists from xlsx document
     if wordlist == 'wordlist_1':
         wordlist_sheet = wordlist_book.worksheets[0] # specify which sheet to use
+        n_words = 46
     elif wordlist == 'wordlist_2':
         wordlist_sheet = wordlist_book.worksheets[1]
+        n_words = 46
     elif wordlist == 'wordlist_prac':
         wordlist_sheet = wordlist_book.worksheets[2]
+        n_words = 8
     
     ### create word lists and randomise (pairwise)
-    c_words, r_words, s_order = asWordLists(sheet=wordlist_sheet, n_items=46)
-    rand_c_words, rand_r_words = randomWordLists(cue_words=c_words, recall_words=r_words, stim_order=s_order, num_items=46)
+    c_words, r_words, s_order = asWordLists(sheet=wordlist_sheet, n_items=n_words)
+    rand_c_words, rand_r_words = randomWordLists(cue_words=c_words, recall_words=r_words, stim_order=s_order, num_items=n_words)
     
     win.setColor('#000000', colorSpace='hex') # set the background colour to black and clear the screen
     win.flip() 
@@ -239,7 +248,7 @@ def wordRecall(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
     mic_stop_times = []
     
     # display each cue word on it's own (random order), then display matching recall word after a mouse click
-    for i in range(46):
+    for i in range (n_words):
         order.append(i+1)
         cueWordListText_recall.setText(rand_c_words[i]) # set the cue word
         cue_word.append(rand_c_words[i])
@@ -440,6 +449,7 @@ cueWordListText_recall = visual.TextStim(win=win, ori=0, name='cueWordListText',
                                wrapWidth=None, color=(1,1,1), colorSpace='rgb', opacity=1, depth=0.0)  # cue word list text settings
 recallWordListText_recall = visual.TextStim(win=win, ori=0, name='recallWordListText', text='', font=u'Arial', pos=[0, 0], height=50,
                                wrapWidth=None, color=(-1, -0.215686274509804, -1), colorSpace='rgb', opacity=1, depth=0.0)  # recall word list text settings - set text to darkgreen
+
 saveToLog('Set up complete') # save info to log
 ### set-up complete ###
 
