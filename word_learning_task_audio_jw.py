@@ -474,34 +474,9 @@ elif not metaData['practice mode']: # if it is NOT practice mode
         if wl_dict['use task type'] == 'word learning':
             res = wordLearning(wordlist=wl_dict['use word list number'], wordlist_type=man_wordlist_type)
         
-        # OR run word RECALL task with accuracy loop
+        # OR run word RECALL task once with word list manually selected
         elif wl_dict['use task type'] == 'word recall':
-            while recall_accuracy == 0: # while participant's score is below 30%
-                res = wordRecall(wordlist=wl_dict['use word list number'], wordlist_type=man_wordlist_type) 
-                # ask user if at least 30% accuracy achieved:
-                myDlg = gui.Dlg(title='Recall accuracy check')
-                myDlg.addText('Did the participant achieve at least 30% accuracy?')
-                myDlg.addField('answer', choices=['no', 'yes'])
-                myDlg.addText('NOTE: if this is a recall session only (pm-b or am), select YES to exit and record final result')
-                acc_dat = myDlg.show() # show dialogue box gui
-                if not myDlg.OK: # if user hit cancel
-                    quitExp() # quit
-                
-                if acc_dat[0] == 'no': # if user selected NO, perform the recall task again
-                    task_attempt_number = task_attempt_number + 1
-                    recall_accuracy = 0
-                elif acc_dat[0] == 'yes': # otherwise, if user selected YES
-                    res['pc30_trial_num'] = task_attempt_number # save task attempt number where participant achieved >30% in csv file
-                    if metaData['session time'] == 'pm-a':
-                        saveToLog('At least 30 percent recall accuracy achieved on attempt number %s' % (task_attempt_number), 0) 
-                    elif metaData['session time'] == 'pm-b' or 'am':
-                        saveToLog('Single trial of word recall task completed with no accuracy feedback provided', 0)
-                    recall_accuracy = 1
-                    break
-
-                # include option to quit, in case of looping error
-                if event.getKeys(['end']): 
-                    quitExp()
+            res = wordRecall(wordlist=wl_dict['use word list number'], wordlist_type=man_wordlist_type) 
 
     # OR if automated counter balancing selected:
     elif metaData['use automated counter-balancing']: 
