@@ -433,6 +433,8 @@ else:  # otherwise, if it is practice mode:
         # redefine file name by iteratively appending a number so that the original files are not overwritten
         fileName = uniq_path(fileName)
     
+    metaData.update({'participant allocation': 'practice'})
+    
     # save metaData to log
     saveToLog('..........................................', 0)
     saveToLog('experiment: %s' % (expName), 0)
@@ -442,7 +444,7 @@ else:  # otherwise, if it is practice mode:
     saveToLog('participant: %s' % (metaData['participant']), 0)
     saveToLog('session: %s' % (metaData['session number']), 0)
     saveToLog('session time: %s' % (metaData['session time']), 0)
-    saveToLog('participant allocation: %s' % ('practice mode'), 0)
+    saveToLog('participant allocation: %s' % (metaData['participant allocation']), 0)
     saveToLog('                                            ', 0)
 
 ### Prepare stimuli etc ###
