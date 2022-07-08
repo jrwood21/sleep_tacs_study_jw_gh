@@ -356,6 +356,10 @@ if not infoBox.OK:  # if user hit cancel
     quitExp()  # quit
 
 # check if participant dir exists, and if not, create one:
+if not os.path.isdir('data'):
+    os.mkdir('data')
+if not os.path.isdir('data' + os.path.sep + 'wordlearning'):
+    os.mkdir('data' + os.path.sep + 'wordlearning')
 p_dir = 'data' + os.path.sep + 'wordlearning' + os.path.sep + 'P' + str(metaData['participant'])
 if not os.path.isdir(p_dir):
     os.mkdir(p_dir)
