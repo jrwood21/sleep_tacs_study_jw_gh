@@ -294,6 +294,8 @@ def wordRecall(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
                 quitExp()  # quit the experiment
         win.flip() # blank the screen
         core.wait(0.1)
+        if (metaData['session time'] == 'pm-b') or (metaData['session time'] == 'am'):
+            core.wait(1.5)
         event.clearEvents()
         
         if metaData['session time'] == 'pm-a': # if it is the learning phase of the pm session
