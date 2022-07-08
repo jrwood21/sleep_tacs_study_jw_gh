@@ -138,6 +138,16 @@ def wordLearning(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
     rdum_c_words, rdum_r_words = randomWordLists(cue_words=dummy_c_words, recall_words=dummy_r_words, stim_order=dummy_s_order, num_items=8)
     rand_dummy_c_words = rdum_c_words[0:4] # only select the first 4
     rand_dummy_r_words = rdum_r_words[0:4]
+    
+    # export word pair presentation order to csv
+    pair_order = np.arange(1,47,1)
+    pres_order_df = pd.DataFrame({'presentation_order': pair_order,
+                                  'cue_word': rand_c_words,
+                                  'response_word': rand_r_words})
+    pres_path = p_dir + os.path.sep + 'P' + str(metaData['participant']) + "_" + str(metaData['participant allocation']) + '_S' + str(metaData['session number']) + '_' + str(metaData['session time']) + '_LEARNING_WORD_ORDER.csv'
+    pres_path = uniq_path(pres_path)
+    pres_order_df.to_csv(pres_path)
+    saveToLog('Learning word presentation order saved to %s' % (pres_path))
 
     win.setColor('#000000', colorSpace='hex') # set the background colour to black and clear the screen
     win.flip() 
@@ -169,16 +179,6 @@ def wordLearning(wordlist, wordlist_type, workbook="wordlists_audio.xlsx"):
                   'session_time': metaData['session time'],
                   'task_type': 'learning',
                   'wordlist_type': wordlist_type}
-    
-    # export word pair presentation order to csv
-    pair_order = np.arange(1,47,1)
-    pres_order_df = pd.DataFrame({'presentation_order': pair_order,
-                                  'cue_word': rand_c_words,
-                                  'response_word': rand_r_words})
-    pres_path = p_dir + os.path.sep + 'P' + str(metaData['participant']) + "_" + str(metaData['participant allocation']) + '_S' + str(metaData['session number']) + '_' + str(metaData['session time']) + '_LEARNING_WORD_ORDER.csv'
-    pres_path = uniq_path(pres_path)
-    pres_order_df.to_csv(pres_path)
-    saveToLog('Learning word presentation order saved to %s' % (pres_path))
     
     # convert session data to df
     store_out = pd.DataFrame(newRow, index=[0])
